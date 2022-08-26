@@ -1,15 +1,30 @@
 {
   "name": "@dczysz/node-red-bit-encode",
   "version": "1.0.0",
-  "description": "Set of nodes to encode multiple integers or booleans into a single integer and decode back to the original key value pairs",
-  "main": "index.js",
+  "description": "Set of nodes to encode multiple integers and booleans into a single integer, then decode back to the original key value pairs",
   "scripts": {
     "test": "jest"
   },
-  "keywords": [],
-  "author": "dczysz",
+  "keywords": [
+    "node-red",
+    "bit",
+    "binary",
+    "encode"
+  ],
+  "author": {
+    "name": "dczysz",
+    "url": "https://github.com/dczysz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dczysz/node-red-bit-encode.git"
+  },
+  "engines": {
+    "node": ">=12.17"
+  },
   "license": "MIT",
   "node-red": {
+    "version": ">=2.0.0",
     "nodes": {
       "bit-encode": "nodes/bit-encode.js",
       "bit-decode": "nodes/bit-decode.js",

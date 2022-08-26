@@ -50,15 +50,15 @@
         <input type="text" id="node-config-input-bits-property-${index}" class="node-config-input-bits-property" value="${data.property || ''}" />
       </div>
       <div class="form-row">
-        <label for="node-config-input-bits-length-${index}"><i class="fa fa-tag"></i> Length</label>
+        <label for="node-config-input-bits-length-${index}"><i class="fa fa-arrows-h"></i> Length</label>
         <input type="text" id="node-config-input-bits-length-${index}" class="node-config-input-bits-length" value="${data.length || 1}" />
       </div>
       <div class="form-row">
-        <label for="node-config-input-bits-shift-${index}"><i class="fa fa-tag"></i> Shift</label>
+        <label for="node-config-input-bits-shift-${index}"><i class="fa fa-angle-double-left"></i> Shift</label>
         <input type="text" id="node-config-input-bits-shift-${index}" class="node-config-input-bits-shift" value="${data.shift || 0}" />
       </div>
       <div class="form-row">
-        <label for="node-config-input-bits-type-${index}"><i class="fa fa-tag"></i> Type</label>
+        <label for="node-config-input-bits-type-${index}"><i class="fa fa-cog"></i> Type</label>
         <input type="text" id="node-config-input-bits-type-${index}" class="node-config-input-bits-type" value="${data.type || 'number'}" />
       </div>
     `;
@@ -267,5 +267,31 @@
 </script>
 
 <script type="text/html" data-help-name="bit-config">
-  <p>Set of nodes to encode multiple integers into a single integer and decode back to the original key value object</p>
+  <p>Configuration node to create a shared configuration when encoding and decoding integers and booleans.</p>
+
+  <p><b>PROPERTIES MUST NOT OVERLAP.  Take care when picking the <code>length</code> and <code>shift</code> values for each property to ensure they do not overlap.</b></p>
+
+  <div class="form-tips">
+    <p>Click the "Update Visual" button to preview changes before saving the configuration.</p>
+  </div>
+
+  <h3>Bit config properties</h3>
+  <dl class="message-properties">
+    <dt>property <span class="property-type">string</span></dt>
+    <dd>Object property name to use for this value</dd>
+
+    <dt>length <span class="property-type">number</span></dt>
+    <dd>Number of bits to use to store this value</dd>
+
+    <dt>shift <span class="property-type">number</span></dt>
+    <dd>Number of bits to shift this value left by</dd>
+
+    <dt>type <span class="property-type">string</span></dt>
+    <dd>
+      The type of value this property will contain, either "number" or "boolean".
+      <div class="form-tips">
+        Note: If "boolean" is selected, the <code>length</code> value determines if the value will be parsed as a single boolean or an array of booleans.
+      </div>
+    </dd>
+  </dl>
 </script>

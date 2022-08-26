@@ -26,11 +26,31 @@
   </div>
 
   <div class="form-row">
-    <label for="node-input-bits"><i class="fa fa-tag"></i> Bit Config</label>
+    <label for="node-input-bits"><i class="fa fa-cog"></i> Bit Config</label>
     <input type="text" id="node-input-bits">
   </div>
 </script>
 
 <script type="text/html" data-help-name="bit-encode">
-  <p>A node to encode multiple integers into a single integer</p>
+  <p>A node to encode multiple integers or booleans into a single integer.</p>
+
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+    <dt>payload <span class="property-type">object</span></dt>
+    <dd>An object containing the values for all configured properties</dd>
+  </dl>
+
+  <p>If a property is configured to be a number, a number must be provided for that property.</p>
+
+  <p>If a property is configured to be a boolean the following must be provided for that property:</p>
+  <ul>
+    <li>A single boolean value (<code>true</code> | <code>false</code>) if the configured <code>length</code> is 1.</li>
+    <li>An array of boolean values (<code>true</code> | <code>false</code>) if the configured <code>length</code> is greater than 1.</li>
+  </ul>
+
+  <h3>Outputs</h3>
+  <dl class="message-properties">
+    <dt>payload <span class="property-type">number</span></dt>
+    <dd>A single integer representation of all the <code>msg.payload</code> object's values</dd>
+  </dl>
 </script>
