@@ -1,0 +1,271 @@
+<script type="text/javascript">
+  RED.nodes.registerType('bit-config', {
+    category: 'config',
+    defaults: {
+      name: { value: "", requirerd: true },
+      bits: {
+        value: [{ property: 'property', length: 8, shift: 0, type: 'number' }],
+        validate: validateBits
+      },
+    },
+    label: function () {
+      return this.name || "bit-config";
+    },
+    oneditprepare: function () {
+      const node = this;
+
+      const container = $('#node-config-input-bits-container');
+
+      container.editableList({
+        addItem,
+        removable: true,
+        sortable: true,
+      });
+
+      this.bits.forEach((data, i) => {
+        container.editableList('addItem', data);
+      });
+
+      visualize(this.bits);
+      console.log(this.bits);
+    },
+    oneditsave: function () {
+      const node = this;
+
+      const items = $('#node-config-input-bits-container').editableList('items');
+      node.bits = [];
+
+      items.each((i, item) => {
+        node.bits.push(exportBitRow(item))
+      });
+
+      console.log(node.bits);
+    }
+  });
+
+  function addItem(container, index, data) {
+    const content = `
+      <div class="form-row">
+        <label for="node-config-input-bits-property-${index}"><i class="fa fa-tag"></i> Property</label>
+        <input type="text" id="node-config-input-bits-property-${index}" class="node-config-input-bits-property" value="${data.property || ''}" />
+      </div>
+      <div class="form-row">
+        <label for="node-config-input-bits-length-${index}"><i class="fa fa-tag"></i> Length</label>
+        <input type="text" id="node-config-input-bits-length-${index}" class="node-config-input-bits-length" value="${data.length || 1}" />
+      </div>
+      <div class="form-row">
+        <label for="node-config-input-bits-shift-${index}"><i class="fa fa-tag"></i> Shift</label>
+        <input type="text" id="node-config-input-bits-shift-${index}" class="node-config-input-bits-shift" value="${data.shift || 0}" />
+      </div>
+      <div class="form-row">
+        <label for="node-config-input-bits-type-${index}"><i class="fa fa-tag"></i> Type</label>
+        <input type="text" id="node-config-input-bits-type-${index}" class="node-config-input-bits-type" value="${data.type || 'number'}" />
+      </div>
+    `;
+
+    $(content).appendTo(container);
+
+    container.find('.node-config-input-bits-property').typedInput({
+      default: 'str',
+      types: ['str'],
+    });
+    container.find('.node-config-input-bits-length').typedInput({
+      default: 'num',
+      types: ['num'],
+    });
+    container.find('.node-config-input-bits-shift').typedInput({
+      default: 'num',
+      types: ['num'],
+    });
+    container.find('.node-config-input-bits-type').typedInput({
+      type: 'str',
+      types: [
+        {
+          value: 'str',
+          default: data.type || 'number',
+          options: [
+            { value: 'number', label: 'Number' },
+            { value: 'boolean', label: 'Boolean' },
+          ],
+        },
+      ],
+    });
+  }
+  
+  function onChange(event, type, value) {
+    console.log({ event, type, value });
+  }
+
+  function exportBitRow(bitRow) {
+    return {
+      property: bitRow.find('.node-config-input-bits-property').val() || '',
+      length: +bitRow.find('.node-config-input-bits-length').val() || 0,
+      shift: +bitRow.find('.node-config-input-bits-shift').val() || 0,
+      type: bitRow.find('.node-config-input-bits-type').val() || 'number',
+    };
+  }
+
+  function validateBits(bits) {
+    const taken = {};
+
+    for (const piece of bits) {
+      if (!piece.property) {
+        console.log('Missing property name');
+        return false;
+      }
+
+      if (piece.length <= 0 || piece.shift < 0) return false;
+      if (!Number.isInteger(piece.length) || !Number.isInteger(piece.shift)) return false;
+
+      const from = piece.shift;
+      const to = from + piece.length;
+
+      for (let i = from; i < to; i++) {
+        if (taken[i]) {
+          console.log(`Overlapping properties: ${taken[i]} and ${piece.property}`);
+          return false;
+        }
+        taken[i] = piece.property;
+      }
+    }
+
+    return true;
+  }
+
+  function calcNumBits(bits) {
+    let max = 0;
+    for (const { shift, length } of bits) {
+      const end = shift + length;
+      if (end > max) max = end;
+    }
+    return max;
+  }
+
+  function visualize(bits) {
+    const container = $('#visual')[0];
+    const $numBits = $('#numBits');
+    const $errors = $('#errors');
+
+    const numBits = calcNumBits(bits);
+
+    $numBits.text(numBits);
+
+    if (!validateBits(bits)) {
+      $errors.text('Invalid configuration');
+      return;
+    }
+    
+    removeChildren(container);
+
+    if (numBits > 64) {
+      $errors.text('Too long to display');
+      return;
+    }
+
+    $errors.text('');
+
+    container.style.gridTemplateColumns = `repeat(${numBits}, 1fr)`;
+
+    for (let i = numBits - 1; i >= 0; i--) {
+      $(`<div class="bit">${i}</div>`).appendTo(container);
+    }
+
+    // Add property labels
+    for (const { property, shift, length, type } of bits) {
+      const start = numBits - (shift + length) + 1;
+      const end = numBits - shift + 1;
+      const range = type === 'number' ? `0 - ${2 ** length - 1}` : 'true/false'
+
+      $(`
+        <div
+          class="bit-label"
+          style="grid-column-start: ${start}; grid-column-end: ${end};"
+          title="${property} (${range})"
+        >
+          ${property}
+          <br/>
+          ${range}
+        </div>
+      `).appendTo(container);
+    }
+  }
+
+  function removeChildren(element) {
+    while (element.firstChild) {
+      element.firstChild.remove();
+    }
+  }
+
+  function updateVisual() {
+    const items = $('#node-config-input-bits-container').editableList('items');
+    const bits = [];
+
+    items.each((i, item) => {
+      bits.push(exportBitRow(item));
+    });
+
+    visualize(bits);
+  }
+</script>
+
+<script type="text/html" data-template-name="bit-config">
+  <style>
+    .visual-container {
+      border: 1px solid var(--red-ui-primary-border-color);
+      border-radius: 4px;
+      padding: 5px;
+      background-color: #f3f3f3;
+    }
+
+    .visual-container > button {
+      margin-bottom: 10px;
+    }
+
+    #visual {
+      display: grid;
+      grid-template-rows: auto auto;
+      gap: 4px;
+    }
+
+    #visual > div {
+      background-color: #fff;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--red-ui-primary-border-color);
+      padding: 8px 4px;
+      border-radius: 2px;
+    }
+
+    #visual .bit-label {
+      background-color: #fff;
+      grid-row-start: 2;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    #errors {
+      color: var(--red-ui-text-color-error);
+      font-weight: bold;
+    }
+  </style>
+
+  <div class="form-row">
+    <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-config-input-name" placeholder="Name">
+  </div>
+
+  <div class="form-row visual-container">
+    <button type="button" class="red-ui-button" onclick="updateVisual()">Update visual</button>
+    <p>Total bit length: <span id="numBits"></span></p>
+    <p id="errors"></p>
+    <div id="visual"></div>
+  </div>
+
+  <div class="form-row node-config-input-bits-container-row">
+    <ol id="node-config-input-bits-container"></ol>
+  </div>
+</script>
+
+<script type="text/html" data-help-name="bit-config">
+  <p>Set of nodes to encode multiple integers into a single integer and decode back to the original key value object</p>
+</script>

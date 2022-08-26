@@ -1,0 +1,36 @@
+<script type="text/javascript">
+  RED.nodes.registerType('bit-encode', {
+    category: 'function',
+    color: '#a6bbcf',
+    defaults: {
+      name: { value: "", requirerd: true },
+      bits: { type: "bit-config" },
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "join.svg",
+    label: function () {
+      if (this.bits) {
+        const configNode = RED.nodes.node(this.bits);
+        if (configNode && configNode.name) return `encode: ${configNode.name}`;
+      }
+      return this.name || "bit-encode";
+    },
+  });
+</script>
+
+<script type="text/html" data-template-name="bit-encode">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-bits"><i class="fa fa-tag"></i> Bit Config</label>
+    <input type="text" id="node-input-bits">
+  </div>
+</script>
+
+<script type="text/html" data-help-name="bit-encode">
+  <p>A node to encode multiple integers into a single integer</p>
+</script>
