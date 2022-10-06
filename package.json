@@ -1,6 +1,6 @@
 {
   "name": "@dczysz/node-red-bit-encode",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Set of nodes to encode multiple integers and booleans into a single integer, then decode back to the original key value pairs",
   "scripts": {
     "test": "jest"
