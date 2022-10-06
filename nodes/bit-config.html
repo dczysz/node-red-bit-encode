@@ -27,7 +27,6 @@
       });
 
       visualize(this.bits);
-      console.log(this.bits);
     },
     oneditsave: function () {
       const node = this;
@@ -38,8 +37,6 @@
       items.each((i, item) => {
         node.bits.push(exportBitRow(item))
       });
-
-      console.log(node.bits);
     }
   });
 
@@ -90,10 +87,6 @@
         },
       ],
     });
-  }
-  
-  function onChange(event, type, value) {
-    console.log({ event, type, value });
   }
 
   function exportBitRow(bitRow) {

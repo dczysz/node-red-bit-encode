@@ -1,3 +1,5 @@
+<script src="resources/@dczysz/node-red-bit-encode/utils.js"></script>
+
 <script type="text/javascript">
   RED.nodes.registerType('bit-encode', {
     category: 'parser',
@@ -10,11 +12,20 @@
     outputs: 1,
     icon: "join.svg",
     label: function () {
+      if (this.name) return this.name;
+
       if (this.bits) {
         const configNode = RED.nodes.node(this.bits);
         if (configNode && configNode.name) return `encode: ${configNode.name}`;
       }
-      return this.name || "bit-encode";
+      return "bit-encode";
+    },
+    oneditprepare: function () {
+      $('#node-input-bits').on('change', e => {
+        showConfigExample(e.target.value, '#config-example');
+      });
+
+      showConfigExample(this.bits, '#config-example');
     },
   });
 </script>
@@ -28,6 +39,22 @@
   <div class="form-row">
     <label for="node-input-bits"><i class="fa fa-cog"></i> Bit Config</label>
     <input type="text" id="node-input-bits">
+  </div>
+
+  <hr />
+
+  <div class="form-row">
+    <p><b>Example Input</b> 
+      <button
+        type="button"
+        class="red-ui-button red-ui-button-small"
+        style="margin-left: 4px;"
+        onclick="copyToClipboard('config-example')"
+      >
+        Copy
+      </button>
+    </p>
+    <pre id="config-example" style="min-width: 0px;"></pre>
   </div>
 </script>
 
